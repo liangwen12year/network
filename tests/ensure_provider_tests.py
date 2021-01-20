@@ -90,6 +90,9 @@ NM_ONLY_TESTS = {
         EXTRA_RUN_CONDITION: "ansible_distribution_major_version == '7'",
     },
     "playbooks/tests_wireless_plugin_installation.yml": {},
+    "playbooks/tests_wireless_wpa3_sae.yml": {
+        EXTRA_RUN_CONDITION: "ansible_distribution_major_version != '7'",
+    },
 }
 
 IGNORE = [
