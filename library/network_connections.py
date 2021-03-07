@@ -676,7 +676,15 @@ class NMUtil:
     def connection_ensure_setting(self, connection, setting_type):
         setting = connection.get_setting(setting_type)
         if not setting:
-            setting = setting_type.new()
+            util_nm = Util.NM()
+            if (
+                hasattr(util_nm, "SettingMatch")
+                and setting_type is util_nm.SettingMatch
+            ):
+                # https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/commit/4d609dd92f2922e92888e02b5b857e4d7b10a37e
+                setting = util_nm.SettingMatch()
+            else:
+                setting = setting_type.new()
             connection.add_setting(setting)
         return setting
 
@@ -805,6 +813,9 @@ class NMUtil:
             )
             s_wired = self.connection_ensure_setting(con, NM.SettingWired)
             s_wired.set_property(NM.SETTING_WIRED_MAC_ADDRESS, connection["mac"])
+            if hasattr(NM, "SettingMatch") and hasattr(NM, "SETTING_MATCH_PATH"):
+                s_match = self.connection_ensure_setting(con, NM.SettingMatch)
+                s_match.set_property(NM.SETTING_MATCH_PATH, connection["match.path"])
         elif connection["type"] == "infiniband":
             s_con.set_property(
                 NM.SETTING_CONNECTION_TYPE, NM.SETTING_INFINIBAND_SETTING_NAME
@@ -813,6 +824,9 @@ class NMUtil:
             s_infiniband.set_property(
                 NM.SETTING_INFINIBAND_MAC_ADDRESS, connection["mac"]
             )
+            if hasattr(NM, "SettingMatch") and hasattr(NM, "SETTING_MATCH_PATH"):
+                s_match = self.connection_ensure_setting(con, NM.SettingMatch)
+                s_match.set_property(NM.SETTING_MATCH_PATH, connection["match.path"])
             s_infiniband.set_property(
                 NM.SETTING_INFINIBAND_TRANSPORT_MODE,
                 connection["infiniband"]["transport_mode"],

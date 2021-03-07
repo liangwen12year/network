@@ -1252,6 +1252,11 @@ class ArgValidator_DictConnection(ArgValidatorDict):
                 ArgValidatorDeprecated("master", deprecated_by="controller"),
                 ArgValidatorStr("interface_name", allow_empty=True),
                 ArgValidatorMac("mac"),
+                ArgValidatorList(
+                    "match.path",
+                    nested=ArgValidatorStr("match.path[?]"),
+                    default_value=list,
+                ),
                 ArgValidatorNum(
                     "mtu", val_min=0, val_max=0xFFFFFFFF, default_value=None
                 ),
@@ -1491,6 +1496,14 @@ class ArgValidator_DictConnection(ArgValidatorDict):
                         "but is '%s'" % result["mac"],
                     )
 
+            if "match.path" in result:
+                if result["type"] not in ["ethernet", "infiniband"]:
+                    raise ValidationError(
+                        name + ".match.path",
+                        "a 'match.path' address is only allowed for type 'ethernet' "
+                        "or 'infiniband'",
+                    )
+
             if result["type"] == "infiniband":
                 if "infiniband" not in result:
                     result["infiniband"] = self.nested[
@@ -1555,7 +1568,7 @@ class ArgValidator_DictConnection(ArgValidatorDict):
                         "invalid 'interface_name' '%s'" % (result["interface_name"]),
                     )
             else:
-                if not result.get("mac"):
+                if not result.get("mac") and not result.get("match.path"):
                     if not Util.ifname_valid(result["name"]):
                         raise ValidationError(
                             name + ".interface_name",

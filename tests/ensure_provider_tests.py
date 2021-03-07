@@ -78,6 +78,9 @@ NM_ONLY_TESTS = {
     },
     "playbooks/tests_802_1x_updated.yml": {},
     "playbooks/tests_802_1x.yml": {},
+    "playbooks/tests_eth_pci_address_match.yml": {
+        EXTRA_RUN_CONDITION: "ansible_distribution == 'Fedora' and ansible_distribution_major_version == '33'",
+    },
     "playbooks/tests_reapply.yml": {},
     # team interface is not supported on Fedora
     "playbooks/tests_team.yml": {
