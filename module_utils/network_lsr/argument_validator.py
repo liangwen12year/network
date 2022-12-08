@@ -1028,6 +1028,26 @@ class ArgValidator_DictEthernet(ArgValidatorDict):
         return result
 
 
+class ArgValidator_DictTun(ArgValidatorDict):
+    def __init__(self):
+        ArgValidatorDict.__init__(
+            self,
+            name="tun",
+            nested=[
+                ArgValidatorStr("group"),
+                ArgValidatorNum("mode", val_min=1, val_max=2, default_value=1),
+                ArgValidatorBool("multi_queue", default_value=False),
+                ArgValidatorStr("owner", default_value=None),
+                ArgValidatorBool("pi", default_value=False),
+                ArgValidatorBool("vnet-hdr", default_value=False),
+            ],
+            default_value=ArgValidator.MISSING,
+        )
+
+    def get_default_tun(self):
+        return dict([(k, v.get_default_value()) for k, v in self.nested.items()])
+
+
 class ArgValidator_DictEthtool(ArgValidatorDict):
     def __init__(self):
         ArgValidatorDict.__init__(
@@ -1782,6 +1802,7 @@ class ArgValidator_DictConnection(ArgValidatorDict):
         "macvlan",
         "wireless",
         "dummy",
+        "tun",
     ]
     VALID_PORT_TYPES = ["bridge", "bond", "team"]
 
@@ -1836,6 +1857,7 @@ class ArgValidator_DictConnection(ArgValidatorDict):
                 ArgValidator_DictInfiniband(),
                 ArgValidator_DictVlan(),
                 ArgValidator_DictMacvlan(),
+                ArgValidator_DictTun(),
                 ArgValidator_Dict802_1X(),
                 ArgValidator_DictWireless(),
                 ArgValidator_DictMatch(),
