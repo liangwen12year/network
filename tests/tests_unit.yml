@@ -176,6 +176,21 @@
             state: absent
             path: "{{ _rundir.path }}"
 
+        - name: Verify DNS and ping still work
+          shell: |
+            set -euxo pipefail
+            for host in mirrors.fedoraproject.org mirrors.centos.org; do
+              if ! getent hosts "$host"; then
+                exit 1
+              fi
+              if ! ping -c5 "$host"; then
+                exit 1
+              fi
+            done
+          when: ansible_facts["distribution"] == "CentOS"
+          changed_when: false
+
+
     - name: Ensure that at least one python unit test ran
       fail:
         msg: Tests did not run with python2 or python3
