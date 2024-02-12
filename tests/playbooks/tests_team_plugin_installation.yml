@@ -42,17 +42,7 @@
         that:
           - "'NetworkManager-team' in ansible_facts.packages"
         msg: "NetworkManager-team is not installed after team configuration"
-    - name: Verify DNS and ping still work
-      shell: |
-        set -euxo pipefail
-        for host in mirrors.fedoraproject.org mirrors.centos.org; do
-          if ! getent hosts "$host"; then
-            exit 1
-          fi
-          if ! ping -c5 "$host"; then
-            exit 1
-          fi
-        done
-      when: ansible_facts["distribution"] == "CentOS"
-      changed_when: false
+
+    - name: Verify network state restored to default
+      include_tasks: tasks/check_network_dns.yml
 ...

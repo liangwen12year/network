@@ -60,16 +60,5 @@
               failed_when: false
             - name: Include the task 'cleanup_mock_wifi.yml'
               include_tasks: tasks/cleanup_mock_wifi.yml
-            - name: Verify DNS and ping still work
-              shell: |
-                set -euxo pipefail
-                for host in mirrors.fedoraproject.org mirrors.centos.org; do
-                  if ! getent hosts "$host"; then
-                    exit 1
-                  fi
-                  if ! ping -c5 "$host"; then
-                    exit 1
-                  fi
-                done
-              when: ansible_facts["distribution"] == "CentOS"
-              changed_when: false
+            - name: Verify network state restored to default
+              include_tasks: tasks/check_network_dns.yml
